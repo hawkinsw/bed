@@ -1,0 +1,6 @@
+[package]
+name = "bed"
+version = "0.1.0"
+authors = ["Will Hawkins <hawkinsw@borlaugic.com>"]
+
+[dependencies]
