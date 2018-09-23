@@ -28,7 +28,7 @@ fn print_usage(program_name: String) {
 
 fn main() -> std::io::Result<()> {
 	let mut args: Vec<String> = env::args().collect();
-	let replace: u64;
+	let replace_location: u64;
 	let mut replacement: Vec<u8> = Vec::<u8>::new();
 	let mut input: io::Stdin = io::stdin();
 	let mut output: io::Stdout = io::stdout();
@@ -40,7 +40,7 @@ fn main() -> std::io::Result<()> {
 		                          "Not enough parameters."));
 	}
 
-	replace = match u64::from_str_radix(&args[1], 16) {
+	replace_location = match u64::from_str_radix(&args[1], 16) {
 		Ok(v) => v,
 		Err(_) => return Err(io::Error::new(io::ErrorKind::Other,
 		                          "Error parsing replacement index parameter."))
@@ -66,9 +66,14 @@ fn main() -> std::io::Result<()> {
 	/*
 	  TODO: Make sure that the replacement fits within the content.
 	 */
+	if (replace_location as usize + replacement.len()) > contents.len() {
+		return Err(io::Error::new(io::ErrorKind::Other,
+														  "Replacement too long for file contents."));
+	}
 
-	for i in (replace .. replace + (replacement.len() as u64)) {
-		contents[i as usize] = replacement.pop().unwrap();
+	for i in (replace_location .. replace_location + (replacement.len() as u64)) {
+		contents[i as usize] = replacement[0];
+		replacement = replacement[1..].to_vec();
 	}
 
 	write_file(&mut output, &contents)
